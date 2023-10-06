@@ -5,6 +5,7 @@ date: "2023-09-15"
 output: html_document
 ---
 
+
 ```{r}
 library(tidyverse)
 library(dplyr)
@@ -14,7 +15,6 @@ library(dplyr)
 
 ```{r}
 DAWBA <- read_csv("DAWBA_database.csv")
-
 #View(DAWBA)
 
 ```
@@ -179,533 +179,56 @@ w_DAWBA <- w_DAWBA %>%
     . == 2 ~ "a lot"))
 
 w_DAWBA <- w_DAWBA[, -c(69)]
-view(w_DAWBA)
+#view(w_DAWBA)
 
 
 
 # saving the file
-file_path <- "w_DAWBA.csv"
-write.csv(w_DAWBA, file = file_path, row.names = FALSE)
+#file_path <- "w_DAWBA.csv"
+#write.csv(w_DAWBA, file = file_path, row.names = FALSE)
 
 ```
 
-
-
-
-
-
-
-##### Dataset utilizing the numeric data to explore data
-
-```{r}
-# colMeans(is.na(DAWBA)) > .60
-```
+#### Final dataset w/ numeric data 
 
 ```{r}
 dim(DAWBA)
 
-c_DAWBA <- DAWBA[, colMeans(is.na(DAWBA)) <= .60]
+n_DAWBA <- DAWBA[, colMeans(is.na(DAWBA)) <= .60]
 dim(c_DAWBA)
 
-#view(c_DAWBA)
+n_DAWBA <- n_DAWBA[, -c(517:531)] #deleting the "other concerns" questions
+
+n_DAWBA <- n_DAWBA[, -c(240:251)] #deleting the heights and weights
+
+n_DAWBA <- n_DAWBA[, -c(2:56)] #deleting general + Prediction sections
+
+dim(n_DAWBA) #checking dimensions after deletions of non necessary questions
+
+
+#Deleting all the questions that are the youth answers of Depression, DMDD, Generalized Anxiety, OCD, BDD
+
+n_DAWBA <- n_DAWBA[, -c(2:107, 136:143, 173:203, 221:239, 256:278, 289:449)]
+
+n_DAWBA <- n_DAWBA[, -c(12)]
+n_DAWBA <- n_DAWBA[, -c(69)]
+
+#view(w_DAWBA)
+
+dim(n_DAWBA) #One identifier and 99 questions
+
+#view(n_DAWBA)
 ```
 
-
-##### reverse coding + Means 
-
-SDQ section : making all greater numbers = negative outcomes and lesser numbers 
+Adding in Means per section
 ```{r}
-sdq_r = c("s_sdq_1_considerate", "s_sdq_4_shares", "s_sdq_6_solitary", "s_sdq_7_obedient", "s_sdq_9_helpful", "s_sdq_11_good_friend", "s_sdq_14_popular", "s_sdq_17_kind_children", "s_sdq_20_volunteers", "s_sdq_21_reflective", "s_sdq_25_good_attention", "p_sdq_1_considerate", "p_sdq_4_shares", "p_sdq_6_solitary", "p_sdq_7_obedient", "p_sdq_9_helpful", "p_sdq_11_good_friend", "p_sdq_14_popular", "p_sdq_17_kind_children", "p_sdq_20_volunteers", "p_sdq_21_reflective", "p_sdq_25_good_attention")
-
-c_DAWBA[ ,sdq_r] = 2 - c_DAWBA[ ,sdq_r]
-
-#view(c_DAWBA)
-```
-
-```{r}
-c_DAWBA$MeanSDQ <- rowMeans(c_DAWBA[, 57:122],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-Attacthment section :No reverse coding necessary ; higher the number the more attachment
-```{r}
-c_DAWBA$MeanAttach <- rowMeans(c_DAWBA[, 123:140],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-ADHD Section: 
-```{r}
-c_DAWBA$MeanADHD <- rowMeans(c_DAWBA[, 141:144],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-ASD Section:
-recoded the social aptitude scale. Higher answers are less likely to match ASD. 
-```{r}
-asd_r = c("p_asd_soc_apt_scale_1_laugh", "p_asd_soc_apt_scale_2_chat", "p_asd_soc_apt_scale_3_flexible", "p_asd_soc_apt_scale_4_defuse_tense", "p_asd_soc_apt_scale_5_good_loser", "p_asd_soc_apt_scale_6_others_ease", "p_asd_soc_apt_scale_7_tell_others_think_feel", "p_asd_soc_apt_scale_8_apologizes", "p_asd_soc_apt_scale_9_leads",  "p_asd_soc_apt_scale_10_socially_appropriate")
-
-c_DAWBA[ ,asd_r] = 4 - c_DAWBA[ ,asd_r]
-
+n_DAWBA$MeanBDD <- rowMeans(n_DAWBA[, 2:28],na.rm=TRUE)
+n_DAWBA$MeanDep <- rowMeans(n_DAWBA[, 29:57],na.rm=TRUE)
+n_DAWBA$MeanDMDD <- rowMeans(n_DAWBA[, 58:73],na.rm=TRUE)
+n_DAWBA$MeanGenA <- rowMeans(n_DAWBA[, 74:89],na.rm=TRUE)
+n_DAWBA$MeanOCD <- rowMeans(n_DAWBA[, 90:99],na.rm=TRUE)
 ```
 
 ```{r}
-c_DAWBA$MeanASD <- rowMeans(c_DAWBA[, 146:162],na.rm=TRUE)
-#view(c_DAWBA)
+#view(n_DAWBA)
 ```
-
-BDD Section: no reverse coding, only did mean
-```{r}
-
-R1 <- c_DAWBA[, 163:172] 
-R2 <- c_DAWBA[, 174:191]
-c_DAWBA$MeanBDD <- rowMeans(cbind(R1, R2),na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-Conduct Section:  a higher number yields more negative conduct than a lower number.
-```{r}
-c_DAWBA$MeanCD <- rowMeans(c_DAWBA[, 192:198],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-Depression Section:  a higher number yields greater likelihood of depression
-```{r}
-c_DAWBA$MeanDep <- rowMeans(c_DAWBA[, 199:234],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-Eating Section: no reverse coding, only did mean
-```{r}
-
-r1 <- c_DAWBA[, 235:239] 
-r2 <- c_DAWBA[, 252:270]
-c_DAWBA$MeanEat <- rowMeans(cbind(r1, r2),na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-DMDD Section: no reverse coding, only did mean
-```{r}
-
-r_1 <- c_DAWBA[, 271:281] 
-r_2 <- c_DAWBA[, 283:299] 
-r_3 <- c_DAWBA[, 301:306] 
-c_DAWBA$MeanDMDD <- rowMeans(cbind(r_1, r_2, r_3),na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-
-Generalized Anxiety Section:  a higher number yields greater liklihood of generalozed anxiety
-```{r}
-c_DAWBA$MeanGenA <- rowMeans(c_DAWBA[, 307:336],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-
-Mania Section:  a higher number yields greater liklihood of mania/bipolar disorder
-```{r}
-c_DAWBA$MeanMania <- rowMeans(c_DAWBA[, 337:345],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-
-OCD Section:  a higher number yields greater liklihood of OCD
-```{r}
-c_DAWBA$MeanOCD<- rowMeans(c_DAWBA[, 346:369],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-
-Panic Section:  
-```{r}
-c_DAWBA$MeanPanic <- rowMeans(c_DAWBA[, 370:385],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-
-PTSD Section:  a higher number yields greater liklihood of PTSD
-```{r}
-c_DAWBA$MeanPTSD <- rowMeans(c_DAWBA[, 386:387],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-
-Psychosis Section:  a higher number yields greater liklihood of psychosis
-```{r}
-c_DAWBA$MeanPsy <- rowMeans(c_DAWBA[, 388:397],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-
-Separation Anxiety Section:  a higher number yields greater liklihood of separation anxiety
-```{r}
-c_DAWBA$MeanSepA <- rowMeans(c_DAWBA[, 398:419],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-
-Social Phobia Section:  a higher number yields greater liklihood of social phobia
-```{r}
-c_DAWBA$MeanSoPh <- rowMeans(c_DAWBA[, 420:433],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-Specific Phobias Section:  a higher number yields greater specific phobias
-```{r}
-c_DAWBA$MeanSpPh <- rowMeans(c_DAWBA[, 434:460],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-Strengths Section:  a higher number yields greater personal strengths
-```{r}
-c_DAWBA$MeanStrengths <- rowMeans(c_DAWBA[, 461:503],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-Substance Use Section:  a higher number yields greater substance use
-```{r}
-c_DAWBA$MeanSubst <- rowMeans(c_DAWBA[, 504:514],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-Tics Section:  a higher number yields greater presence of tics
-```{r}
-c_DAWBA$MeanTics <- rowMeans(c_DAWBA[, 515:516],na.rm=TRUE)
-#view(c_DAWBA)
-```
-
-```{r}
-c_DAWBA <- c_DAWBA[, -c(517:531)]
-```
-Deleting weights+heights
-```{r}
-c_DAWBA <- c_DAWBA[, -c(240:251)]
-```
-
-
-###### Adding in Means of parents vs children
-SDQ
-```{r}
-sdq_P<- c_DAWBA[, grep("^p_sdq_", names(c_DAWBA))]
-sdq_P_Mean <- rowMeans(sdq_P, na.rm=TRUE)
-
-c_DAWBA$sdq_P_Mean <- sdq_P_Mean
-
-sdq_S<- c_DAWBA[, grep("^s_sdq_", names(c_DAWBA))]
-sdq_S_Mean <- rowMeans(sdq_S, na.rm=TRUE)
-
-c_DAWBA$sdq_S_Mean <- sdq_S_Mean
-
-#view(c_DAWBA)
-```
-
-
-Attachment
-```{r}
-att_P<- c_DAWBA[, grep("^p_attachment_", names(c_DAWBA))]
-att_P_Mean <- rowMeans(att_P, na.rm=TRUE)
-
-c_DAWBA$att_P_Mean <- att_P_Mean
-
-att_S<- c_DAWBA[, grep("^s_attachment_", names(c_DAWBA))]
-att_S_Mean <- rowMeans(att_S, na.rm=TRUE)
-
-c_DAWBA$att_S_Mean <- att_S_Mean
-```
-
-
-ADHD
-```{r}
-adhd_P<- c_DAWBA[, grep("^p_adhd_", names(c_DAWBA))]
-adhd_P_Mean <- rowMeans(adhd_P, na.rm=TRUE)
-
-c_DAWBA$adhd_P_Mean <- adhd_P_Mean
-
-adhd_S<- c_DAWBA[, grep("^s_adhd_", names(c_DAWBA))]
-adhd_S_Mean <- rowMeans(adhd_S, na.rm=TRUE)
-
-c_DAWBA$adhd_S_Mean <- adhd_S_Mean
-```
-
-
-BDD
-```{r}
-bdd_P<- c_DAWBA[, grep("^p_bdd_", names(c_DAWBA))]
-bdd_P_Mean <- rowMeans(bdd_P, na.rm=TRUE)
-
-c_DAWBA$bdd_P_Mean <- bdd_P_Mean
-
-bdd_S<- c_DAWBA[, grep("^s_bdd_", names(c_DAWBA))]
-bdd_S_Mean <- rowMeans(bdd_S, na.rm=TRUE)
-
-c_DAWBA$bdd_S_Mean <- bdd_S_Mean
-```
-
-
-Depression
-```{r}
-dep_P<- c_DAWBA[, grep("^p_dep_", names(c_DAWBA))]
-dep_P_Mean <- rowMeans(dep_P, na.rm=TRUE)
-
-c_DAWBA$dep_P_Mean <- dep_P_Mean
-
-dep_S<- c_DAWBA[, grep("^s_dep_", names(c_DAWBA))]
-dep_S_Mean <- rowMeans(dep_S, na.rm=TRUE)
-
-c_DAWBA$dep_S_Mean <- dep_S_Mean
-```
-
-
-DMDD
-```{r}
-dmdd_P<- c_DAWBA[, grep("^p_dmdd_", names(c_DAWBA))]
-dmdd_P_Mean <- rowMeans(dmdd_P, na.rm=TRUE)
-
-c_DAWBA$dmdd_P_Mean <- dmdd_P_Mean
-
-dmdd_S<- c_DAWBA[, grep("^s_dmdd_", names(c_DAWBA))]
-dmdd_S_Mean <- rowMeans(dmdd_S, na.rm=TRUE)
-
-c_DAWBA$dmdd_S_Mean <- dmdd_S_Mean
-```
-
-
-Separation Anxiety
-```{r}
-sepA_P<- c_DAWBA[, grep("^p_sep_anx", names(c_DAWBA))]
-sepA_P_Mean <- rowMeans(sepA_P, na.rm=TRUE)
-
-c_DAWBA$sepA_P_Mean <- sepA_P_Mean
-
-sepA_S<- c_DAWBA[, grep("^s_sep_anx", names(c_DAWBA))]
-sepA_S_Mean <- rowMeans(sepA_S, na.rm=TRUE)
-
-c_DAWBA$sepA_S_Mean <- sepA_S_Mean
-```
-
-
-Social Phobia
-```{r}
-socP_P<- c_DAWBA[, grep("^p_social_", names(c_DAWBA))]
-socP_P_Mean <- rowMeans(socP_P, na.rm=TRUE)
-
-c_DAWBA$socP_P_Mean <- socP_P_Mean
-
-socP_S<- c_DAWBA[, grep("^s_social_", names(c_DAWBA))]
-socP_S_Mean <- rowMeans(socP_S, na.rm=TRUE)
-
-c_DAWBA$socP_S_Mean <- socP_S_Mean
-```
-
-
-Specific Phobia
-```{r}
-speP_P<- c_DAWBA[, grep("^p_specific_", names(c_DAWBA))]
-speP_P_Mean <- rowMeans(speP_P, na.rm=TRUE)
-
-c_DAWBA$speP_P_Mean <- speP_P_Mean
-
-speP_S<- c_DAWBA[, grep("^s_specific_", names(c_DAWBA))]
-speP_S_Mean <- rowMeans(speP_S, na.rm=TRUE)
-
-c_DAWBA$speP_S_Mean <- speP_S_Mean
-```
-
-
-Positive Attributes (strengths)
-```{r}
-str_P<- c_DAWBA[, grep("^p_positive_", names(c_DAWBA))]
-str_P_Mean <- rowMeans(str_P, na.rm=TRUE)
-
-c_DAWBA$str_P_Mean <- str_P_Mean
-
-str_S<- c_DAWBA[, grep("^s_positive_", names(c_DAWBA))]
-str_S_Mean <- rowMeans(str_S, na.rm=TRUE)
-
-c_DAWBA$str_S_Mean <- str_S_Mean
-```
-
-
-General Anxiety Disorder
-```{r}
-gad_P<- c_DAWBA[, grep("^p_gad_", names(c_DAWBA))]
-gad_P_Mean <- rowMeans(gad_P, na.rm=TRUE)
-
-c_DAWBA$GenA_P_Mean <- gad_P_Mean
-
-gad_S<- c_DAWBA[, grep("^s_gad_", names(c_DAWBA))]
-gad_S_Mean <- rowMeans(gad_S, na.rm=TRUE)
-
-c_DAWBA$GenA_S_Mean <- gad_S_Mean
-```
-
-
-OCD
-```{r}
-ocd_P<- c_DAWBA[, grep("^p_ocd_", names(c_DAWBA))]
-ocd_P_Mean <- rowMeans(ocd_P, na.rm=TRUE)
-
-c_DAWBA$ocd_P_Mean <- ocd_P_Mean
-
-ocd_S<- c_DAWBA[, grep("^s_ocd_", names(c_DAWBA))]
-ocd_S_Mean <- rowMeans(ocd_S, na.rm=TRUE)
-
-c_DAWBA$ocd_S_Mean <- ocd_S_Mean
-```
-
-
-ODD
-```{r}
-odd_P<- c_DAWBA[, grep("^p_odd_", names(c_DAWBA))]
-odd_P_Mean <- rowMeans(odd_P, na.rm=TRUE)
-
-c_DAWBA$odd_P_Mean <- odd_P_Mean
-
-odd_S<- c_DAWBA[, grep("^s_odd_", names(c_DAWBA))]
-odd_S_Mean <- rowMeans(odd_S, na.rm=TRUE)
-
-c_DAWBA$odd_S_Mean <- odd_S_Mean
-```
-
-
-Panic
-```{r}
-pan_P<- c_DAWBA[, grep("^p_panic_", names(c_DAWBA))]
-pan_P_Mean <- rowMeans(pan_P, na.rm=TRUE)
-
-c_DAWBA$pan_P_Mean <- pan_P_Mean
-
-pan_S<- c_DAWBA[, grep("^s_panic_", names(c_DAWBA))]
-pan_S_Mean <- rowMeans(pan_S, na.rm=TRUE)
-
-c_DAWBA$pan_S_Mean <- pan_S_Mean
-```
-
-
-PTSD
-```{r}
-ptsd_P<- c_DAWBA[, grep("^p_ptsd_", names(c_DAWBA))]
-ptsd_P_Mean <- rowMeans(ptsd_P, na.rm=TRUE)
-
-c_DAWBA$ptsd_P_Mean <- ptsd_P_Mean
-
-ptsd_S<- c_DAWBA[, grep("^s_ptsd_", names(c_DAWBA))]
-ptsd_S_Mean <- rowMeans(ptsd_S, na.rm=TRUE)
-
-c_DAWBA$ptsd_S_Mean <- ptsd_S_Mean
-```
-
-```{r}
-view(c_DAWBA)
-```
-
-```{r}
-c_DAWBA$Participant <- 1:nrow(c_DAWBA)
-```
-
-
-
-
-###### Looking at the percentage of questions where the child rated themselves higher based off section means. 
-
-Depression
-```{r}
-count_Sdep_greater<- sum(c_DAWBA$dep_S_Mean > c_DAWBA$dep_P_Mean, na.rm=TRUE)
-(count_Sdep_greater/(nrow(c_DAWBA)))*100
-```
-
-Generalized Anxiety
-```{r}
-count_Sga_greater<- sum(c_DAWBA$GenA_S_Mean > c_DAWBA$GenA_P_Mean, na.rm=TRUE)
-(count_Sga_greater/(nrow(c_DAWBA)))*100
-```
-
-SDQ
-```{r}
-count_Sdq_greater<- sum(c_DAWBA$sdq_S_Mean > c_DAWBA$sdq_P_Mean, na.rm=TRUE)
-(count_Sdq_greater/(nrow(c_DAWBA)))*100
-```
-
-Attachment
-```{r}
-count_Satt_greater<- sum(c_DAWBA$att_S_Mean > c_DAWBA$att_P_Mean, na.rm=TRUE)
-(count_Satt_greater/(nrow(c_DAWBA)))*100
-```
-
-ADHD
-```{r}
-count_Sadhd_greater<- sum(c_DAWBA$adhd_S_Mean > c_DAWBA$adhd_P_Mean, na.rm=TRUE)
-(count_Sadhd_greater/(nrow(c_DAWBA)))*100
-```
-
-BDD
-```{r}
-count_Sbdd_greater<- sum(c_DAWBA$bdd_S_Mean > c_DAWBA$bdd_P_Mean, na.rm=TRUE)
-(count_Sbdd_greater/(nrow(c_DAWBA)))*100
-```
-
-DMDD
-```{r}
-count_Sdmdd_greater<- sum(c_DAWBA$dmdd_S_Mean > c_DAWBA$dmdd_P_Mean, na.rm=TRUE)
-(count_Sdmdd_greater/(nrow(c_DAWBA)))*100
-```
-
-Separation Anxiety
-```{r}
-count_SepA_greater<- sum(c_DAWBA$sepA_S_Mean > c_DAWBA$sepA_P_Mean, na.rm=TRUE)
-(count_SepA_greater/(nrow(c_DAWBA)))*100
-```
-
-Social Phobias
-```{r}
-count_SocP_greater<- sum(c_DAWBA$socP_S_Mean > c_DAWBA$socP_P_Mean, na.rm=TRUE)
-(count_SocP_greater/(nrow(c_DAWBA)))*100
-```
-
-Specific Phobias
-```{r}
-count_SpeP_greater<- sum(c_DAWBA$speP_S_Mean > c_DAWBA$speP_P_Mean, na.rm=TRUE)
-(count_SpeP_greater/(nrow(c_DAWBA)))*100
-```
-
-OCD
-```{r}
-count_Socd_greater<- sum(c_DAWBA$ocd_S_Mean > c_DAWBA$ocd_P_Mean, na.rm=TRUE)
-(count_Socd_greater/(nrow(c_DAWBA)))*100
-```
-
-ODD
-```{r}
-count_Sodd_greater<- sum(c_DAWBA$odd_S_Mean > c_DAWBA$odd_P_Mean, na.rm=TRUE)
-(count_Sodd_greater/(nrow(c_DAWBA)))*100
-```
-
-Panic
-```{r}
-count_Span_greater<- sum(c_DAWBA$pan_S_Mean > c_DAWBA$pan_P_Mean, na.rm=TRUE)
-(count_Span_greater/(nrow(c_DAWBA)))*100
-```
-
-PTSD
-```{r}
-count_Sptsd_greater<- sum(c_DAWBA$ptsd_S_Mean > c_DAWBA$ptsd_P_Mean, na.rm=TRUE)
-(count_Sptsd_greater/(nrow(c_DAWBA)))*100
-```
-
-Positive 
-```{r}
-count_Spos_greater<- sum(c_DAWBA$str_S_Mean > c_DAWBA$str_P_Mean, na.rm=TRUE)
-(count_Spos_greater/(nrow(c_DAWBA)))*100
-```
-
-```{r}
-b<-(3/14)*100
-100-b
-
-```
-
-
-
-
-
-
-
