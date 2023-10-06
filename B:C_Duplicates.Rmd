@@ -1,0 +1,110 @@
+---
+title: "Behavioural+Clinical Deuplicates"
+author: "Josephine Decker"
+date: "2023-10-04"
+output: html_document
+---
+
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
+
+### Clinical
+
+```{r}
+C <- read_csv("clinical_database.csv")
+
+#view(C)
+```
+
+```{r}
+value_counts <- table(C$SDAN)
+result <- data.frame(
+  Value = names(value_counts),
+  Count = as.vector(value_counts))
+  
+print(result)
+
+value_counts1 <- table(result$Count)
+result2 <- data.frame(
+  value_appearance = names(value_counts1),
+  Count = as.vector(value_counts1))
+  
+print(result2)
+```
+```{r}
+result2$value_appearance <- as.numeric(result2$value_appearance)
+
+ggplot(result2, aes(x = value_appearance, y = Count)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = unique(result2$value_appearance))
+```
+
+
+
+```{r}
+(4/4349)* 100
+
+```
+
+```{r}
+(4/258)* 100
+```
+
+```{r}
+(254/258)* 100
+```
+
+
+
+### Behavioural
+
+```{r}
+B <- read_csv("behavioural_database.csv")
+
+#view(B)
+
+value_counts <- table(B$SDAN)
+result <- data.frame(
+  Value = names(value_counts),
+  Count = as.vector(value_counts))
+  
+print(result)
+
+value_counts1 <- table(result$Count)
+result2 <- data.frame(
+  value_appearance = names(value_counts1),
+  Count = as.vector(value_counts1))
+  
+print(result2)
+```
+
+```{r}
+result2$value_appearance <- as.numeric(result2$value_appearance)
+
+ggplot(result2, aes(x = value_appearance, y = Count)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(
+    breaks = unique(result2$value_appearance),
+    expand = c(0.00000000001, 0)  
+  )
+```
+
+
+```{r}
+(5/5467)* 100 
+```
+
+```{r}
+(5/258)* 100
+```
+
+```{r}
+(253/258)* 100
+```
+
