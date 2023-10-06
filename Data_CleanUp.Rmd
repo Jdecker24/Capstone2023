@@ -188,6 +188,29 @@ w_DAWBA <- w_DAWBA[, -c(69)]
 #write.csv(w_DAWBA, file = file_path, row.names = FALSE)
 
 ```
+##### Looking into what percentage NA's in the rows
+
+```{r}
+percentage_na <- rowSums(is.na(w_DAWBA)) / ncol(w_DAWBA) * 100
+w_DAWBA$PercentageNA <- percentage_na
+
+w_DAWBA<- w_DAWBA%>%
+  arrange(PercentageNA)
+view(w_DAWBA)
+```
+
+
+```{r}
+value_counts <- table(w_DAWBA$PercentageNA)
+result <- data.frame(
+  PercentNA = names(value_counts),
+  Count = as.vector(value_counts))
+  
+print(result)
+```
+
+
+
 
 #### Final dataset w/ numeric data 
 
