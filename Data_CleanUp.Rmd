@@ -398,7 +398,7 @@ ggplot(test_data, aes(Participant_Type2))+
 dim(DAWBA)
 
 n_DAWBA <- DAWBA[, colMeans(is.na(DAWBA)) <= .60]
-dim(c_DAWBA)
+dim(n_DAWBA)
 
 n_DAWBA <- n_DAWBA[, -c(517:531)] #deleting the "other concerns" questions
 
