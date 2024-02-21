@@ -1,0 +1,256 @@
+---
+title: "Untitled"
+author: "Josephine Decker"
+date: "2024-02-21"
+output: html_document
+---
+
+```{r}
+W_DAWBA <- read_csv("DAWBA_database.csv")
+
+view(W_DAWBA)
+
+```
+
+```{r}
+selected_columns <- grep('SDAN|s_dmdd|s_adhd|s_dep|s_mania|s_gad', names(W_DAWBA), value = TRUE)
+
+W_DAWBA <- W_DAWBA[, selected_columns]
+
+#view(W_DAWBA)
+
+
+W_DAWBA <- W_DAWBA %>%
+  distinct(SDAN, .keep_all = TRUE)
+
+write.csv(W_DAWBA, file = "W_DAWBA.csv", row.names = FALSE)
+
+
+```
+
+
+```{r}
+Demos <- read_csv("clinical_database.csv")
+Demos <- Demos%>%
+  select(SDAN, SEX, Age_at_visit)
+```
+
+```{r}
+Demos
+
+Demos <- Demos %>%
+  group_by(SDAN) %>%
+  mutate(AGE = min(Age_at_visit))
+
+Demos<- Demos%>%
+  select(SDAN,SEX,AGE)
+
+Demos <- Demos %>%
+  distinct(SDAN, .keep_all = TRUE)
+
+view(Demos)
+
+Demos%>%
+  count(SDAN)
+
+Fin_DAWBA <- inner_join(Demos, W_DAWBA, by = "SDAN")
+```
+
+
+
+
+```{r}
+Fin_DAWBA <- Fin_DAWBA %>%
+  filter(!is.na(AGE))
+
+view(Fin_DAWBA)
+```
+
+```{r}
+names(Fin_DAWBA)
+```
+
+```{r}
+C1 <- c(4:6, 42:52, 54,56, 57, 60:62,66, 102, 108:134)
+
+F_DAWBA <- Fin_DAWBA %>%
+  mutate_at(vars(C1), ~case_when(
+    . == 0 ~ "no",
+    . == 1 ~ "a little",
+    . == 2 ~ "a lot",
+    TRUE ~ as.character(.)
+  ))
+
+C2 <- c(7:19, 12:14, 17:19, 21:33, 63, 74, 75, 88, 89, 103:106, 135:108, 141:142)
+
+F_DAWBA <- F_DAWBA %>%
+  mutate_at(vars(C2), ~case_when(
+    . == 0 ~ "no",
+    . == 1 ~ "yes",
+    TRUE ~ as.character(.)
+  ))
+
+
+C3 <- c(10,15)
+
+F_DAWBA <- F_DAWBA %>%
+  mutate_at(vars(C3), ~case_when(
+    . == 0 ~ "easily",
+    . == 1 ~ "with difficulty and only briefly",
+    . == 2 ~ "not at all",
+    TRUE ~ as.character(.)
+  ))
+
+
+C4 <- c(11,16,20)
+
+F_DAWBA <- F_DAWBA %>%
+  mutate_at(vars(C4), ~case_when(
+    . == 0 ~ "less than 2 weeks",
+    . == 1 ~ "2 weeks or more",
+    TRUE ~ as.character(.)
+  ))
+
+C5 <- c(34:39, 59, 68:73, 96:101, 144:148)
+
+F_DAWBA <- F_DAWBA %>%
+  mutate_at(vars(C5), ~case_when(
+    . == 0 ~ "not at all",
+    . == 1 ~ "a little",
+    . == 2 ~ "a medium amount",
+    . == 3 ~ "a great deal",
+    TRUE ~ as.character(.)
+  ))
+
+
+C6 <- c(40:41)
+
+F_DAWBA <- F_DAWBA %>%
+  mutate_at(vars(C6), ~case_when(
+    . == 0 ~ "never",
+    . == 1 ~ "occasionally",
+    . == 2 ~ "once or twice a week",
+    . == 3 ~ "three or more times a week",
+    . == 4 ~ "every day",
+    TRUE ~ as.character(.)
+  ))
+
+C7 <- c(53,76)
+
+F_DAWBA <- F_DAWBA %>%
+  mutate_at(vars(C7), ~case_when(
+    . == 0 ~ "no",
+    . == 1 ~ "perhaps",
+    . == 2 ~ "definitely",
+    TRUE ~ as.character(.)
+  ))
+
+
+C8 <- c(55,65)
+
+F_DAWBA <- F_DAWBA %>%
+  mutate_at(vars(C8), ~case_when(
+    . == 0 ~ "3 months or more",
+    . == 1 ~ "1-2 months",
+    . == 2 ~ "less than a month",
+    . == 3 ~ "less than a week",
+    . == 4 ~ "less than a day",
+    TRUE ~ as.character(.)
+  ))
+
+C9 <- c(58)
+
+F_DAWBA <- F_DAWBA %>%
+  mutate_at(vars(C9), ~case_when(
+    . == 0 ~ "no more than a few minutes",
+    . == 1 ~ "less than an hour",
+    . == 2 ~ "a few hours",
+    . == 3 ~ "most or all of the day",
+    TRUE ~ as.character(.)
+  ))
+
+C10 <- c(64)
+
+F_DAWBA <- F_DAWBA %>%
+  mutate_at(vars(C10), ~case_when(
+    . == 0 ~ "well under half of them",
+    . == 1 ~ "about half of them",
+    . == 2 ~ "well over half of them",
+    . == 3 ~ "all or nearly all of them",
+    TRUE ~ as.character(.)
+  ))
+
+
+C11 <- c(77:87)
+
+F_DAWBA <- F_DAWBA %>%
+  mutate_at(vars(C11), ~case_when(
+    . == 0 ~ "no more than others",
+    . == 1 ~ "a little more than others",
+    . == 2 ~ "a lot more than others",
+    TRUE ~ as.character(.)
+  ))
+
+
+C12 <- c(90:95)
+
+F_DAWBA <- F_DAWBA %>%
+  mutate_at(vars(C12), ~case_when(
+    . == 0 ~ "no",
+    . == 1 ~ "yes but not on most days",
+    . == 2 ~ "yes happens more days than not",
+    TRUE ~ as.character(.)
+  ))
+
+C13 <- c(107)
+
+F_DAWBA <- F_DAWBA %>%
+  mutate_at(vars(C13), ~case_when(
+    . == 0 ~ "minutes",
+    . == 1 ~ "hours",
+    . == 2 ~ "most of the day or longer",
+    TRUE ~ as.character(.)
+  ))
+
+
+C14 <- c(139,143)
+
+F_DAWBA <- F_DAWBA %>%
+  mutate_at(vars(C14), ~case_when(
+    . == 0 ~ "less than an hour",
+    . == 1 ~ "less than 24 hours",
+    . == 2 ~ "1-3 days",
+    . == 3 ~ "4-6 days",
+    . == 4 ~ "once or more a week",
+    TRUE ~ as.character(.)
+  ))
+
+C15 <- c(140)
+
+F_DAWBA <- F_DAWBA %>%
+  mutate_at(vars(C15), ~case_when(
+    . == 0 ~ "never",
+    . == 1 ~ "once",
+    . == 2 ~ "2-4 times",
+    . == 3 ~ "5 or more times",
+    TRUE ~ as.character(.)
+  ))
+
+
+F_DAWBA <- F_DAWBA[, -149]
+
+
+view(F_DAWBA)
+
+
+
+write.csv(F_DAWBA, file = "final_project_dataset.csv", row.names = FALSE)
+
+```
+
+
+
+
+
+
+
